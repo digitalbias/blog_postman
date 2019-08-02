@@ -6,6 +6,13 @@ In the future I want to make this a process that you start up and it just keeps 
 
 Currently uses GitHub API v4 to do the git management.
 
+## Installation
+
+* Install erlang and elixir
+* Install dependencies `mix deps get`
+* rename `.env.sample` to `.env` and set the environment variables for your access token, repo name and your username.
+* Start writing
+
 ## Running
 
 Just type `make` at the command-line and if everything is installed properly, it will pubish your banch to the website.
