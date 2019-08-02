@@ -1,21 +1,11 @@
 # BlogPostman
 
-**TODO: Add description**
+A tool to post to a github pages website. Designed to post to a blog where the day of the post, the branch is formated to look like `Scheduled(2009-04-23)`. Then if this script is run on that day, the PR will be created, merged with the master branch and the post will be published for that day.
 
-## Installation
+In the future I want to make this a process that you start up and it just keeps running, but for now it has to be run every day on the day of the blog post.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `blog_postman` to your list of dependencies in `mix.exs`:
+Currently uses GitHub API v4 to do the git management.
 
-```elixir
-def deps do
-  [
-    {:blog_postman, "~> 0.1.0"}
-  ]
-end
-```
+## Running
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/blog_postman](https://hexdocs.pm/blog_postman).
-
+Just type `make` at the command-line and if everything is installed properly, it will pubish your banch to the website.
