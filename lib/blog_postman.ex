@@ -19,14 +19,16 @@ defmodule BlogPostman do
     repo_id = extract_repo_id(BlogPostman.Client.query_for_repo(token, owner, repo_name))
     IO.puts "Creating pull request for merge..."
     pr_id = extract_pr_id(BlogPostman.Client.create_pull_request(token, repo_id, branch_name))
-    IO.puts "Merging new post..."
-    merge_status = extract_merge_status(BlogPostman.Client.merge_pull_request(token, pr_id))
-    IO.puts "Merge returned with status of: #{merge_status}"
+
+    case pr_id do
+      {:ok, id} -> merge_post(token, id)
+      {:error, errors} -> display_errors(errors)
+    end
   end
 
   def formated_date do
     Timex.now
-    |> Timex.format!("{YYYY}-{0M}-{D}")
+    |> Timex.format!("{YYYY}-{0M}-{0D}")
   end
 
   def generate_branch_name do
@@ -38,10 +40,27 @@ defmodule BlogPostman do
   end
 
   def extract_pr_id(%{"data" => %{"createPullRequest" => %{"pullRequest" => %{"id" => id }}}}) do
-    id
+    {:ok, id}
+  end
+
+  def extract_pr_id(%{"errors" => errors}) do
+    {:error, errors}
   end
 
   def extract_merge_status(%{"data" => %{"mergePullRequest" => %{"pullRequest" => %{"state" => state }}}}) do
     state
+  end
+
+  def merge_post(token, pr_id) do
+    IO.puts "Merging new post..."
+    merge_status = extract_merge_status(BlogPostman.Client.merge_pull_request(token, pr_id))
+    IO.puts "Merge returned with status of: #{merge_status}"
+  end
+
+  def display_errors(errors) do
+    IO.puts "Unable to merge branch due to the following errors"
+    Enum.each(errors, fn error ->
+      IO.puts "---> " <> error["message"]
+    end)
   end
 end
