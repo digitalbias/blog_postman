@@ -15,15 +15,25 @@ defmodule BlogPostman do
     BlogPostman.Client.query_for_repo(token, owner, repo_name)
     branch_name = generate_branch_name()
 
-    IO.puts "Getting site repository"
-    repo_id = extract_repo_id(BlogPostman.Client.query_for_repo(token, owner, repo_name))
-    IO.puts "Creating pull request for merge..."
-    pr_id = extract_pr_id(BlogPostman.Client.create_pull_request(token, repo_id, branch_name))
+    IO.puts "Checking for existing PR"
+    pr_id = extract_node_pr_id(BlogPostman.Client.find_existing_pull_request(token, owner, repo_name, branch_name))
+
+    pr_id = case pr_id do 
+      {:ok, id} -> {:ok, id}
+      {:not_found} -> create_pull_request(token, owner, repo_name, branch_name)
+    end
 
     case pr_id do
       {:ok, id} -> merge_post(token, id)
       {:error, errors} -> display_errors(errors)
     end
+  end
+
+  def create_pull_request(token, owner, repo_name, branch_name) do
+    IO.puts "Getting site repository"
+    repo_id = extract_repo_id(BlogPostman.Client.query_for_repo(token, owner, repo_name))
+    IO.puts "Creating pull request for merge..."
+    extract_pr_id(BlogPostman.Client.create_pull_request(token, repo_id, branch_name))
   end
 
   def formated_date do
@@ -37,6 +47,14 @@ defmodule BlogPostman do
 
   def extract_repo_id(%{"data" => %{"repository" => %{"id" => repo_id}}}) do
     repo_id
+  end
+
+  def extract_node_pr_id(%{"data" => %{"search" => %{"edges" => [%{"node" => %{"id" => id, "state" => "OPEN"}}]}}}) do
+    {:ok, id}
+  end
+
+  def extract_node_pr_id(%{"data" => %{"search" => %{"edges" => []}}}) do
+    {:not_found}
   end
 
   def extract_pr_id(%{"data" => %{"createPullRequest" => %{"pullRequest" => %{"id" => id }}}}) do

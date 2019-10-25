@@ -14,6 +14,10 @@ defmodule BlogPostman.Client do
     query(token, repo_query(owner, repo_name))
   end
 
+  def find_existing_pull_request(token, owner, repo_name, branch_name) do
+    query(token, find_existing_pull_request(owner, repo_name, branch_name))
+  end
+
   def create_pull_request(token, repo_id, branch_name) do
     query(token, create_pull_request_query(repo_id, branch_name))
   end
@@ -32,6 +36,26 @@ defmodule BlogPostman.Client do
     """
     |> String.replace("$owner", owner)
     |> String.replace("$repo_name", repo_name)
+  end
+
+  def find_existing_pull_request(owner, repo_name, branch_name) do
+    """
+    {
+      search(query: "repo:$owner/$repo_name is:pr $branch_name in:title state:open", type: ISSUE, last: 1) {
+        edges {
+          node {
+            ... on PullRequest {
+              id
+              state
+            }
+          }
+        }
+      }
+    }
+    """
+    |> String.replace("$owner", owner)
+    |> String.replace("$repo_name", repo_name)
+    |> String.replace("$branch_name", branch_name)    
   end
 
   def create_pull_request_query(repo_id, branch_name) do
