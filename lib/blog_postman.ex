@@ -69,6 +69,10 @@ defmodule BlogPostman do
     state
   end
 
+  def extract_merge_status(%{"data" => %{"mergePullRequest" => nil}, "errors" => [%{"locations" => _, "message" => message, "type" => type}]}) do
+    type <> ": " <> message
+  end
+
   def merge_post(token, pr_id) do
     IO.puts "Merging new post..."
     merge_status = extract_merge_status(BlogPostman.Client.merge_pull_request(token, pr_id))
