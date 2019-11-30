@@ -37,7 +37,7 @@ defmodule BlogPostman do
   end
 
   def formated_date do
-    Timex.now
+    Timex.now(Timex.Timezone.Local.lookup())
     |> Timex.format!("{YYYY}-{0M}-{0D}")
   end
 
