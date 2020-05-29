@@ -5,6 +5,7 @@ defmodule BlogPostman.Client do
 
   def query(token, query_body) do
     Neuron.Config.set(url: "https://api.github.com/graphql")
+    Neuron.Config.set(connection_opts: connection_opts())
     Neuron.Config.set(headers: headers(token))
     {:ok, %Neuron.Response{body: body}} = Neuron.query(query_body)
     body
@@ -98,6 +99,14 @@ defmodule BlogPostman.Client do
     [
       "Authorization": "bearer #{token}",
       "Content-Type": "application/json"
+    ]
+  end
+
+  def connection_opts() do
+    [
+      ssl: [
+        {:versions, [:"tlsv1.2"]}
+      ]
     ]
   end
 end

@@ -21,7 +21,8 @@ defmodule BlogPostman.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:neuron, "~> 1.1.1"},
+      {:neuron, "~> 4.1.2"},
+      {:jason, "~> 1.1"},
       {:timex, "~> 3.5"}
     ]
   end
